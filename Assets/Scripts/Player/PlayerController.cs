@@ -19,8 +19,10 @@ public class PlayerController : MonoBehaviour{
     }
     
     void Update(){
-        if (LevelManager.instance.miniGameIsOpened)
+        if (LevelManager.instance.miniGameIsOpened){
+            rb.velocity = Vector2.zero;
             return;
+        }
         if (Time.timeScale > 0 && (Mathf.Abs(Input.GetAxisRaw("Horizontal")) == 1 || Mathf.Abs(Input.GetAxisRaw("Vertical")) == 1))
             rb.velocity = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical")) * movementSpeed;
         else

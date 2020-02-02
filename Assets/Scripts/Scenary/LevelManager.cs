@@ -16,22 +16,24 @@ public class LevelManager : MonoBehaviour{
     [SerializeField] private Area[] areaPrefabs;
     [SerializeField] private Area startArea;
     [SerializeField] private AudioSource levelAudio;
+    [SerializeField] private MiniGame1Manager miniGame1;
 
     [Header("Word Configurations")] 
     [SerializeField] [Range(10,90)] private int proceduralPercentageProbability;
 
     [SerializeField] [Range(0, 1)] private float minPercentage, maxPercentage;
-    [SerializeField] private int minRooms, maxRooms, retryLimit, totalGoals;
-    [SerializeField] private Vector2Int mapSize;
+    [SerializeField] private int minRooms, maxRooms, retryLimit, totalGoals, horizontalSectorCount;
+    [SerializeField] private Vector2Int mapSize, currentCoordinate;
     [SerializeField] private Area[,] generatedMap;
     [SerializeField] private bool[,] ocupiedArea;
 
     //Pool de áreas para construção procedural de cenário
     private List<Area>[] areaPool = new List<Area>[4];
     
-    public int timesRegenerated, roomsGenerated, goalsPlaced, resourcesPlaced, challengesPlaced, pump1Placed, pump2Placed, pump3Placed;
+    public int timesRegenerated, roomsGenerated, goalsPlaced, resourcesPlaced, challengesPlaced, pump1Placed, pump2Placed, pump3Placed, resources, challenges;
     public bool miniGameIsOpened = false;
     public bool insideFireRegion = true;
+    public bool pump1, pump2, pump3;
     public bool enableFireEffect{
         get{ return insideFireRegion && !miniGameIsOpened; }
     }
@@ -56,11 +58,15 @@ public class LevelManager : MonoBehaviour{
         PopulateAreaPool(areaPrefabs);
         ocupiedArea = new bool[mapSize.x,mapSize.y];
         generatedMap = new Area[mapSize.x,mapSize.y];
-        minRooms = (int)((mapSize.x * mapSize.y) * minPercentage);
+        horizontalSectorCount = mapSize.x / 3;
+        resources = (int)(totalGoals * 3.5f);
+        challenges = totalGoals * 3;
+        minRooms = resources + challenges + totalGoals + 5;
         maxRooms = (int)((mapSize.x * mapSize.y) * maxPercentage);
+        insideFireRegion = false;
         GenerateMap();
         PlaceResources();
-        MoveCameraToArea(startArea.transform, LinkedDirection.down);
+        MoveCameraToArea(startArea.transform);
         _player.SetStartPosition(startArea.transform.position);
     }
 
@@ -72,6 +78,11 @@ public class LevelManager : MonoBehaviour{
         }
     }
 
+    public void StartMinigame1(bool isCarnivour){
+        miniGame1.gameObject.SetActive(true);
+        miniGame1.SetCarnivour(isCarnivour);
+    }
+
     public void InteractWithMinigame(bool active){
         miniGameIsOpened = active;
         if (active)
@@ -80,11 +91,39 @@ public class LevelManager : MonoBehaviour{
             levelAudio.Play();
     }
 
+    public void MoveCameraToArea(Transform targetArea){
+        _virtualCamera.LookAt = targetArea;
+        _virtualCamera.Follow = targetArea;
+        _virtualCamera.m_Lens.NearClipPlane = 0;
+    }
+    
     public void MoveCameraToArea(Transform targetArea, LinkedDirection direction){
         _virtualCamera.LookAt = targetArea;
         _virtualCamera.Follow = targetArea;
         _virtualCamera.m_Lens.NearClipPlane = 0;
         _player.EnterInArea(direction);
+        switch (direction){
+            case LinkedDirection.up:
+                currentCoordinate += Vector2Int.up;
+                break;
+            case LinkedDirection.down:
+                currentCoordinate += Vector2Int.down;
+                break;
+            case LinkedDirection.left:
+                currentCoordinate += Vector2Int.left;
+                break;
+            case LinkedDirection.right:
+                currentCoordinate += Vector2Int.right;
+                break;
+        }
+
+        if (currentCoordinate.x <= horizontalSectorCount){
+            insideFireRegion = !pump1 && targetArea != startArea.transform;
+        }else if (currentCoordinate.x > horizontalSectorCount && currentCoordinate.x <= (horizontalSectorCount * 2)){
+            insideFireRegion = !pump2 && targetArea != startArea.transform;
+        }else if (currentCoordinate.x > horizontalSectorCount * 2){
+            insideFireRegion = !pump3 && targetArea != startArea.transform;
+        }
     }
     
     //Função de teste para geração inicial do mapa
@@ -129,8 +168,10 @@ public class LevelManager : MonoBehaviour{
                         return;
                     }
                     generatedMap[x,y] = Instantiate(prefabArea, lastArea, Quaternion.identity, transform);
-                    if(generatedMap[x,y].waypoints == 4 && startArea == null)
+                    if (generatedMap[x, y].waypoints == 4 && startArea == null){
                         startArea = generatedMap[x, y];
+                        currentCoordinate = new Vector2Int(x,y);
+                    }
                 }
                 lastArea += Vector2.right * prefabArea.GetComponent<SpriteRenderer>().bounds.extents.x * 2;
             }
@@ -210,9 +251,6 @@ public class LevelManager : MonoBehaviour{
     private void PlaceResources(){
         bool first, middle, final;
         first = middle = final = false;
-        int resources = (int)(totalGoals * 3.5f);
-        int challenges = totalGoals * 3;
-        int horizontalSectorCount = mapSize.x / 3;
         while (goalsPlaced < 3 && challengesPlaced < challenges && resourcesPlaced < resources){
             for (int y = 0; y < mapSize.y; y++){
                 for (int x = 0; x < mapSize.x; x++){

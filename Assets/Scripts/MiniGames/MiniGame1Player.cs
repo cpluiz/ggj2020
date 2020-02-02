@@ -11,7 +11,12 @@ public class MiniGame1Player : MonoBehaviour{
     [SerializeField] private MiniGame1Manager miniGameManager;
     private bool isRotating;
 
+    void Awake(){
+        waterCanImage.localRotation = Quaternion.identity;
+    }
+
     void Update(){
+        if(isRotating) return;
         if(Mathf.Abs(Input.GetAxisRaw("Horizontal")) == 1)
             transform.localScale = new Vector3(Input.GetAxisRaw("Horizontal") * -1, 1, 1);
 

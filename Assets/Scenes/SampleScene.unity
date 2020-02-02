@@ -416,17 +416,32 @@ MonoBehaviour:
   - {fileID: 7257713634076549715, guid: 3c0a8df404ee69846ab6cc53b89fcdcb, type: 3}
   startArea: {fileID: 0}
   levelAudio: {fileID: 519420033}
+  miniGame1: {fileID: 1268069134}
   proceduralPercentageProbability: 57
   minPercentage: 0.37
   maxPercentage: 0.75
   minRooms: 0
   maxRooms: 0
-  retryLimit: 100
+  retryLimit: 450
+  totalGoals: 3
+  horizontalSectorCount: 0
   mapSize: {x: 11, y: 7}
+  currentCoordinate: {x: 0, y: 0}
   timesRegenerated: 0
   roomsGenerated: 0
+  goalsPlaced: 0
+  resourcesPlaced: 0
+  challengesPlaced: 0
+  pump1Placed: 0
+  pump2Placed: 0
+  pump3Placed: 0
+  resources: 0
+  challenges: 0
   miniGameIsOpened: 0
   insideFireRegion: 1
+  pump1: 0
+  pump2: 0
+  pump3: 0
 --- !u!4 &342265222
 Transform:
   m_ObjectHideFlags: 0
