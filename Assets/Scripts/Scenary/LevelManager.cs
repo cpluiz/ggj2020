@@ -14,7 +14,7 @@ public class LevelManager : MonoBehaviour{
     [SerializeField] private CinemachineVirtualCamera _virtualCamera;
     [SerializeField] private PlayerController _player;
     [SerializeField] private Area[] areaPrefabs;
-    [SerializeField] private Area startArea;
+    [SerializeField] private Area startArea, startAreaPrefab;
     [SerializeField] private AudioSource levelAudio;
     [SerializeField] private MiniGame1Manager miniGame1;
 
@@ -78,9 +78,13 @@ public class LevelManager : MonoBehaviour{
         }
     }
 
-    public void StartMinigame1(bool isCarnivour){
+    public void EmptyPlayerCan(){
+        _player.EmptyCan();
+    }
+
+    public void StartMinigame1(bool isCarnivour, bool correctIsCarnivoro){
         miniGame1.gameObject.SetActive(true);
-        miniGame1.SetCarnivour(isCarnivour);
+        miniGame1.SetCarnivour(isCarnivour, correctIsCarnivoro);
     }
 
     public void InteractWithMinigame(bool active){
@@ -133,6 +137,12 @@ public class LevelManager : MonoBehaviour{
         Populate();
         DeleteIfDontHaveNeighbord();
         if (AllRowsConnect() && timesRegenerated < retryLimit && roomsGenerated >= minRooms && roomsGenerated <= maxRooms){
+            for (int y = 0; y < mapSize.y; y++){
+                for (int x = 0; x < mapSize.x; x++){
+                    if(generatedMap[x,y]!= null)
+                        Destroy(generatedMap[x,y].gameObject);
+                }
+            }
             ConstructMap();
         }
         if(timesRegenerated <= retryLimit && startArea == null){
@@ -159,18 +169,20 @@ public class LevelManager : MonoBehaviour{
                     needNeighbor[3] = x > 0 && ocupiedArea[x - 1, y];//vizinho a esquerda
                     portals += needNeighbor[3] ? 1 : 0;
                     int index = Random.Range(0, areaPool[portals-1].Count);
-                    prefabArea = areaPool[portals-1][index];
-                    while (!prefabArea.HasPortals(needNeighbor) ){
-                        prefabArea = areaPool[portals-1][Random.Range(0, areaPool[portals-1].Count)];
-                    }
-                    if (prefabArea == null || generatedMap[x,y] != null){
-                        startArea = null;
-                        return;
+                    if (portals == 4 && startArea == null)
+                        prefabArea = startAreaPrefab;
+                    else{
+                        prefabArea = areaPool[portals-1][index];
+                        while (!prefabArea.HasPortals(needNeighbor) ){
+                            prefabArea = areaPool[portals-1][Random.Range(0, areaPool[portals-1].Count)];
+                        }
                     }
                     generatedMap[x,y] = Instantiate(prefabArea, lastArea, Quaternion.identity, transform);
-                    if (generatedMap[x, y].waypoints == 4 && startArea == null){
-                        startArea = generatedMap[x, y];
-                        currentCoordinate = new Vector2Int(x,y);
+                    if (portals == 4 && startArea == null){
+                        if (prefabArea == startAreaPrefab){
+                            startArea = generatedMap[x, y];
+                            currentCoordinate = new Vector2Int(x,y);
+                        }
                     }
                 }
                 lastArea += Vector2.right * prefabArea.GetComponent<SpriteRenderer>().bounds.extents.x * 2;

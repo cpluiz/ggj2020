@@ -2,17 +2,32 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Item : MonoBehaviour
-{
-    // Start is called before the first frame update
-    void Start()
-    {
-        
+public class Item : MonoBehaviour{
+    private bool playerTouchingItem;
+    private PlayerController player;
+
+
+
+    void Update(){
+        if (playerTouchingItem && Input.GetButton("Action2")){
+            player.GetItem(this);
+        }
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
+    private void OnTriggerEnter2D(Collider2D other){
+        if (other.CompareTag("Player")){
+            player = other.GetComponent<PlayerController>();
+            playerTouchingItem = true;
+        }
+            
+    }
+    
+    
+    private void OnTriggerExit2D(Collider2D other){
+        if (other.CompareTag("Player")){
+            player = null;
+            playerTouchingItem = false;
+        }
+            
     }
 }

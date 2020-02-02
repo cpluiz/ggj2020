@@ -11,6 +11,13 @@ public class PlayerController : MonoBehaviour{
     private Rigidbody2D rb;
     private Animator anim;
     private SpriteRenderer _renderer;
+    private Item[] inventory = new Item[2];
+    private int selectedSlot = 0;
+    public Item selectedItem{
+        get{ return inventory[selectedSlot]; }
+    }
+
+    private bool canHasWater;
 
     void Awake(){
         rb = gameObject.GetComponent<Rigidbody2D>();
@@ -27,6 +34,9 @@ public class PlayerController : MonoBehaviour{
             rb.velocity = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical")) * movementSpeed;
         else
             rb.velocity = Vector2.zero;
+        if (Input.GetButtonDown("Action3")){
+            selectedSlot = selectedSlot == 0 ? 1 : 0;
+        }
     }
 
     public void SetStartPosition(Vector2 position){
@@ -52,6 +62,25 @@ public class PlayerController : MonoBehaviour{
 
     //Retorna se há água no regador - retorna true padrão para testes
     public bool CanHasWater(){
-        return true;
+        return canHasWater;
+    }
+
+    public void FillCan(){
+        canHasWater = true;
+    }
+
+    public void EmptyCan(){
+        canHasWater = false;
+    }
+
+    public void GetItem(Item item){
+        if (inventory[selectedSlot] != null){
+            inventory[selectedSlot].transform.parent = item.transform.parent;
+            inventory[selectedSlot].transform.position = item.transform.position;
+            inventory[selectedSlot].gameObject.SetActive(true);
+        }
+        inventory[selectedSlot] = item;
+        inventory[selectedSlot].transform.parent = this.transform;
+        inventory[selectedSlot].gameObject.SetActive(false);
     }
 }

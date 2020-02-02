@@ -14,9 +14,10 @@ public class MiniGame1Manager : MonoBehaviour
     private bool isEnding = false;
 
     [Header("Game Options")] public float minSpawnInterval, maxSpawnInterval;
-    public bool correctIsCarnivour = false;
+    public bool correctIsCarnivour, plantingCarnivour = false;
 
-    public void SetCarnivour(bool carnivour){
+    public void SetCarnivour(bool plantingCarnivour, bool carnivour){
+        this.plantingCarnivour = plantingCarnivour;
         correctIsCarnivour = carnivour;
     }
     
@@ -48,6 +49,7 @@ public class MiniGame1Manager : MonoBehaviour
             Destroy(item.gameObject);
         }
         StopCoroutine(SpawnItem());
+        LevelManager.instance.EmptyPlayerCan();
         //Lógica para tratar casos de vitória e derrota
         //Enrolando 4 segundos para garantir que a animação do regador vai concluir
         yield return new WaitForSecondsRealtime(2);

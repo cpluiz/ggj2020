@@ -415,6 +415,8 @@ MonoBehaviour:
   - {fileID: 8975798876381768677, guid: 7788329e72cf35142abe5c6b295c1403, type: 3}
   - {fileID: 7257713634076549715, guid: 3c0a8df404ee69846ab6cc53b89fcdcb, type: 3}
   startArea: {fileID: 0}
+  startAreaPrefab: {fileID: 5289877266248847010, guid: 728c3bebeaeee74448ad09e37aed289c,
+    type: 3}
   levelAudio: {fileID: 519420033}
   miniGame1: {fileID: 1268069134}
   proceduralPercentageProbability: 57
@@ -621,7 +623,7 @@ Camera:
     y: 0
     width: 1
     height: 1
-  near clip plane: 0
+  near clip plane: 0.001
   far clip plane: 1000
   field of view: 60
   orthographic: 1
@@ -1366,6 +1368,7 @@ MonoBehaviour:
   minSpawnInterval: 4
   maxSpawnInterval: 7
   correctIsCarnivour: 0
+  plantingCarnivour: 0
 --- !u!4 &1268069135
 Transform:
   m_ObjectHideFlags: 0
@@ -1605,7 +1608,7 @@ MonoBehaviour:
   m_Lens:
     FieldOfView: 60
     OrthographicSize: 3.5
-    NearClipPlane: 0
+    NearClipPlane: 0.001
     FarClipPlane: 1000
     Dutch: 0
     LensShift: {x: 0, y: 0}
