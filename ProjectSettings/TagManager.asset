@@ -13,11 +13,11 @@ TagManager:
   - UI
   - 
   - 
-  - 
-  - 
-  - 
-  - 
-  - 
+  - Portal
+  - Item
+  - Player
+  - MiniGame
+  - MiniGameItem
   - 
   - 
   - 
@@ -40,4 +40,22 @@ TagManager:
   m_SortingLayers:
   - name: Default
     uniqueID: 0
+    locked: 0
+  - name: Background
+    uniqueID: 1868230661
+    locked: 0
+  - name: Objects
+    uniqueID: 2147759649
+    locked: 0
+  - name: Player
+    uniqueID: 556090457
+    locked: 0
+  - name: MiniGameBG
+    uniqueID: 424253527
+    locked: 0
+  - name: MiniGameItens
+    uniqueID: 3182366423
+    locked: 0
+  - name: Lights
+    uniqueID: 979649239
     locked: 0
